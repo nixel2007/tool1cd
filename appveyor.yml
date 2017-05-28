@@ -1,7 +1,4 @@
 version: 1.0.0.{build}
-platform:
-    - x86
-    - x64
 pull_requests:
   do_not_increment_build_number: true
 clone_depth: 1
@@ -14,6 +11,9 @@ environment:
   BOOST_ROOT: c:\Libraries\boost_1_63_0
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_63_0\lib32-msvc-14.0
   BOOST_INCLUDEDIR: C:\Libraries\boost_1_63_0
+  matrix:
+    - compiler: "Visual Studio 14"
+    - compiler: "MinGW Makefiles"
 install:
 - cmd: >-
     appveyor DownloadFile https://github.com/madler/zlib/archive/v1.2.8.zip -FileName zlib-1.2.8.zip
@@ -39,7 +39,7 @@ build_script:
 - cmd: >-
     "%VCDIR%"\vcvarsall.bat
 
-    cmake -G "Visual Studio 14" -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DBOOST_INCLUDEDIR="%BOOST_INCLUDEDIR%" -DZLIB_LIBRARY=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8\build\Release\zlibstatic.lib -DZLIB_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8 .
+    cmake -G %compiler% -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DBOOST_INCLUDEDIR="%BOOST_INCLUDEDIR%" -DZLIB_LIBRARY=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8\build\Release\zlibstatic.lib -DZLIB_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8 .
 
     cmake --build . --config Release
 after_build:
