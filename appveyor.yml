@@ -9,13 +9,14 @@ init:
 environment:
   VCDIR: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\
   BOOST_ROOT: c:\Libraries\boost_1_63_0
-  BOOST_LIBRARYDIR: C:\Libraries\boost_1_63_0\lib32-msvc-14.0
   BOOST_INCLUDEDIR: C:\Libraries\boost_1_63_0
   matrix:
-    - compiler: "Visual Studio 14"
-    - compiler: "MinGW Makefiles"
+    - TOOLCHAIN: msvc14
+      GENERATOR: "Visual Studio 14"
+      BOOST_LIBRARYDIR: C:\Libraries\boost_1_63_0\lib32-msvc-14.0
 install:
 - cmd: >-
+
     appveyor DownloadFile https://github.com/madler/zlib/archive/v1.2.8.zip -FileName zlib-1.2.8.zip
 
     7z x zlib-1.2.8.zip > NUL
@@ -26,7 +27,7 @@ install:
 
     cd build
 
-    cmake -DCMAKE_SHARED_LINKER_FLAGS="/NODEFAULTLIB:MSVCRT" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /Ob2 /D NDEBUG" ..
+    cmake -G "%GENERATOR%" -DCMAKE_SHARED_LINKER_FLAGS="/NODEFAULTLIB:MSVCRT" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /Ob2 /D NDEBUG" ..
 
     cmake --build . --config Release --target zlibstatic
 
@@ -39,7 +40,7 @@ build_script:
 - cmd: >-
     "%VCDIR%"\vcvarsall.bat
 
-    cmake -G %compiler% -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DBOOST_INCLUDEDIR="%BOOST_INCLUDEDIR%" -DZLIB_LIBRARY=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8\build\Release\zlibstatic.lib -DZLIB_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8 .
+    cmake -G "%GENERATOR%" -DBOOST_ROOT="%BOOST_ROOT%" -DBOOST_LIBRARYDIR="%BOOST_LIBRARYDIR%" -DBOOST_INCLUDEDIR="%BOOST_INCLUDEDIR%" -DZLIB_LIBRARY=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8\build\Release\zlibstatic.lib -DZLIB_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\zlib-1.2.8 .
 
     cmake --build . --config Release
 after_build:
